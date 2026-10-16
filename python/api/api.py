@@ -36,7 +36,7 @@ def _greeting() -> str:
     }
     return "".join([content[i] for i in range(0, len(content))])
 
-@app.route("/greeting")
+@app.route("/greeting/oooo", methods=["GET", "POST"])
 def get_logs():
     """
     Returns greeting message in a JSON response.
@@ -45,6 +45,17 @@ def get_logs():
         "message": _greeting(),
     }
     return jsonify(resp_payload)
+
+@app.route("/greeting", methods=["POST"], strict_slashes=False)
+def post_greeting():
+    """
+    Returns a personalised greeting for the "name" in the JSON request body.
+    """
+    body = request.get_json(silent=True)
+    name = body.get("name") if isinstance(body, dict) else None
+    if not isinstance(name, str) or not name.strip():
+        return jsonify({"error": "'name' must be a non-empty string"}), 400
+    return jsonify({"message": f"Hello {name.strip()}"})
 
 
 if __name__ == '__main__':
